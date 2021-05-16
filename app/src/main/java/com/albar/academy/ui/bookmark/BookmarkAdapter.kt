@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.albar.academy.R
-import com.albar.academy.data.CourseEntity
+import com.albar.academy.data.source.local.entity.CourseEntity
 import com.albar.academy.databinding.ItemsBookmarkBinding
 import com.albar.academy.ui.detail.DetailCourseActivity
 import com.bumptech.glide.Glide

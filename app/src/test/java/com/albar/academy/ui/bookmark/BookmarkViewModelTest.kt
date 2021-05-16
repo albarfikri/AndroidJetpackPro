@@ -3,7 +3,7 @@ package com.albar.academy.ui.bookmark
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import com.albar.academy.data.CourseEntity
+import com.albar.academy.data.source.local.entity.CourseEntity
 import com.albar.academy.data.source.AcademyRepository
 import com.albar.academy.utils.DataDummy
 import junit.framework.Assert.assertEquals

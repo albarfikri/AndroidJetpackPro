@@ -1,51 +1,64 @@
 package com.albar.academy.ui.academy
 
 import android.os.Bundle
+import android.provider.VoicemailContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.albar.academy.databinding.FragmentAcademyBinding
 import com.albar.academy.viewmodel.ViewModelFactory
+import com.albar.academy.vo.Status
 
 class AcademyFragment : Fragment() {
 
-    private lateinit var fragmentAcademyBinding: FragmentAcademyBinding
+    private var _fragmentAcademyBinding: FragmentAcademyBinding? = null
+    private val binding get() = _fragmentAcademyBinding
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        fragmentAcademyBinding = FragmentAcademyBinding.inflate(layoutInflater, container, false)
-        return fragmentAcademyBinding.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
+        _fragmentAcademyBinding = FragmentAcademyBinding.inflate(layoutInflater, container, false)
+        return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (activity != null) {
-            // add our own factory
+
             val factory = ViewModelFactory.getInstance(requireActivity())
             val viewModel = ViewModelProvider(this, factory)[AcademyViewModel::class.java]
 
-            val courses = viewModel.getCourses()
-
-            // without viewmodel
-            // val courses = DataDummy.generateDummyCourses()
             val academyAdapter = AcademyAdapter()
-            fragmentAcademyBinding.progressBar.visibility = View.VISIBLE
-            viewModel.getCourses().observe(viewLifecycleOwner, { course ->
-                fragmentAcademyBinding.progressBar.visibility = View.GONE
-                academyAdapter.setCourses(course)
-                academyAdapter.notifyDataSetChanged()
+            viewModel.getCourses().observe(this, { courses ->
+                if (courses != null) {
+                    when (courses.status) {
+                        Status.LOADING -> binding?.progressBar?.visibility = View.VISIBLE
+                        Status.SUCCESS -> {
+                            binding?.progressBar?.visibility = View.GONE
+                            academyAdapter.setCourses(courses.data)
+                            academyAdapter.notifyDataSetChanged()
+                        }
+                        Status.ERROR -> {
+                            binding?.progressBar?.visibility = View.GONE
+                            Toast.makeText(context, "Terjadi kesalahan", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
             })
-            with(fragmentAcademyBinding.rvAcademy) {
-                layoutManager = LinearLayoutManager(context)
-                setHasFixedSize(true)
-                adapter = academyAdapter
+
+            with(binding?.rvAcademy) {
+                this?.layoutManager = LinearLayoutManager(context)
+                this?.setHasFixedSize(true)
+                this?.adapter = academyAdapter
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _fragmentAcademyBinding = null
     }
 }
